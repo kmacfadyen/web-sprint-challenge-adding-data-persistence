@@ -1,19 +1,28 @@
 // build your `/api/tasks` router here
-const db = require('../../data/dbConfig')
+const express = require('express')
 
-async function getTasks () {
-    return db('tasks as t')
-        .leftJoin('projects as p', 'p.project_id', 't.project_id')
-        .select('t.task_id', 't.task_description', 't.task_notes', 
-        't.task_completed', 'p.project_name', 'p.project_description')
-}
+const Task = require('./model')
 
-async function postTask (resource) {
-    const [ resource_id ] = await db('resources').insert(resource)
-    return db('resources').where({ resource_id }).first()    
-}
+const router = express.Router()
 
-module.exports = { 
-    getTasks,
-    postTask
-}
+router.get('/', (req, res, next) => {
+    Task.getTasks()
+        .then(task => {
+            res.status(200).json(task)
+        })
+        .catch(next)
+})
+
+router.post('/', (req, res, next) => {
+    // const currentTask = req.body
+    Task.postTask(req.body)
+        .then(currentTask => {
+            res.status(201).json({
+                ...currentTask,
+                task_completed: currentTask.task_completed? true: false
+            })
+        })
+        .catch(next)
+})
+
+module.exports = router
