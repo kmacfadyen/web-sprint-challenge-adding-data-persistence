@@ -13,4 +13,16 @@ router.get('/', (req, res, next) => {
         .catch(next)
 })
 
+router.post('/', (req, res, next) => {
+    const currentProject = req.body
+    Project.postProject(currentProject)
+        .then(currentProject => {
+            res.status(201).json({
+                ...currentProject,
+                project_completed: currentProject.project_completed? true: false
+            })
+        })
+        .catch(next)
+})
+
 module.exports = router
