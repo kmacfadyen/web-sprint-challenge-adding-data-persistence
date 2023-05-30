@@ -3,7 +3,13 @@ const db = require('../../data/dbConfig')
 
 
 async function getProjects () {
-    return db('projects')
+    const project1 = await db('projects')
+    return project1.map(project => {
+        return {
+            ...project,
+            project_completed: project.project_completed? true:false
+        }
+    })
 }
 
 async function postProject (project) {
